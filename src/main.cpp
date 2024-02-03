@@ -8,6 +8,9 @@
 #include "exchanges/binance.h"
 #include "exchanges/kraken.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include <iostream>
 #include <vector>
 

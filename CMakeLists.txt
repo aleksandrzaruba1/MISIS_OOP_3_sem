@@ -28,6 +28,10 @@ find_package(SQLite3 REQUIRED)
 set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl@3")
 find_package(OpenSSL REQUIRED)
 
+# JSON
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 file(GLOB SOURCES
       src/*.h
       src/*.cpp
@@ -46,14 +50,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE
                            ${CURL_INCLUDE_DIR}
                            ${OPENSSL_INCLUDE_DIR}
                            ${JANSSON_INCLUDE_DIR}
-                           ${SQLITE3_INCLUDE_DIR}
+                           ${SQLite3_INCLUDE_DIR}
                            )
 
 target_link_libraries(${PROJECT_NAME}
                       ${CURL_LIBRARIES}
                       ${OPENSSL_LIBRARIES}
                       ${JANSSON_LIBRARIES}
-                      ${SQLITE3_LIBRARIES}
+                      ${SQLite3_LIBRARIES}
+                      nlohmann_json::nlohmann_json
                       )
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/..)
