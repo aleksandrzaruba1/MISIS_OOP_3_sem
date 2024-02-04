@@ -1,6 +1,6 @@
 #include "parameters.h"
-//#include "utils/db_fun.h"
-//#include "utils/time_fun.h"
+#include "utils/db_fun.h"
+#include "utils/time_fun.h"
 
 //#include "coins/Bitcoin.h"
 //#include "coins/Ethereum.h"
@@ -134,7 +134,6 @@ int main(int argc, char **argv) {
     exch->getAvailBalance(params);
     logFile << "\t" << exch->getExchName() << "\n";
 
-    /*
     for (auto &coin : CoinVec) {
       std::string coinName = coin->getCoinName();
       auto bal = exch->getBalance(coinName);

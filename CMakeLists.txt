@@ -36,10 +36,10 @@ file(GLOB SOURCES
       src/*.h
       src/*.cpp
       #src/exchanges/*.cpp
-      #src/exchanges/*.h
-      #src/coins/*.cpp
-      #src/coins/*.h
-      #src/utils/*.h
+      src/exchanges/*.h
+      src/coins/*.cpp
+      src/coins/*.h
+      src/utils/*.h
       #src/utils/*.cpp
       )
 
@@ -49,15 +49,15 @@ target_include_directories(${PROJECT_NAME} PRIVATE
                            ${PROJECT_SOURCE_DIR}/src
                            ${CURL_INCLUDE_DIR}
                            ${OPENSSL_INCLUDE_DIR}
-                           #${JANSSON_INCLUDE_DIR}
-                           #${SQLite3_INCLUDE_DIR}
+                           ${JANSSON_INCLUDE_DIR}
+                           ${SQLite3_INCLUDE_DIR}
                            )
 
 target_link_libraries(${PROJECT_NAME}
                       ${CURL_LIBRARIES}
                       ${OPENSSL_LIBRARIES}
-                      #${JANSSON_LIBRARIES}
-                      #${SQLite3_LIBRARIES}
+                      ${JANSSON_LIBRARIES}
+                      ${SQLite3_LIBRARIES}
                       )
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_BINARY_DIR}/..)
