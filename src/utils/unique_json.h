@@ -1,4 +1,5 @@
 #pragma once
+
 #include "jansson.h"
 #include <memory>
 

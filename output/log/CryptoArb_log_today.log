@@ -1,0 +1,18 @@
+--------------------------
+|   CryptoArb Log File   |
+--------------------------
+CryptoArb started time: NULL
+
+[ Information ]
+		trading pair: [ BTC, USD ]
+	Demo mode: trades won't be generated
+
+[ Targets ]
+	Spread Entry : 0.8%
+	Spread Target: 0.5%
+
+
+[ Current Balance ]
+
+[ Exposure ]
+

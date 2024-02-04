@@ -1,15 +1,14 @@
 #include "parameters.h"
-#include "utils/db_fun.h"
-#include "utils/time_fun.h"
+//#include "utils/db_fun.h"
+//#include "utils/time_fun.h"
 
-#include "coins/Bitcoin.h"
-#include "coins/Ethereum.h"
+//#include "coins/Bitcoin.h"
+//#include "coins/Ethereum.h"
 
-#include "exchanges/binance.h"
-#include "exchanges/kraken.h"
+//#include "exchanges/binance.h"
+//#include "exchanges/kraken.h"
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
+//#include <gtest/gtest.h>
 
 #include <iostream>
 #include <vector>
@@ -24,19 +23,36 @@ struct Balance {
 int main(int argc, char **argv) {
   std::cout << " >>> CryptoArb Cryptocurrencies Arbitrage Bot <<<" << std::endl;
 
+
+  // read config file
   Parameters params("CryptoArb.conf");
 
-  if (params.isDemoMode)
-    std::cout << " >>> DemoMode <<<" << std::endl;
+  // std::string currDateTime = printDateTimeFileName();
+  std::string currDateTime = "today";
+  std::string logFileName = "output/log/CryptoArb_log_" + currDateTime + ".log";
+  std::cout << " >>> Log file generated at ./output/log/: " << logFileName << " <<<" << std::endl;
+
+  // create log files that stores all the events
+  std::ofstream logFile(logFileName, std::ofstream::trunc);
+  // logFile << std::setprecision(3) << std::fixed;
+  params.logFile = &logFile;
+
+  logFile << "--------------------------\n";
+  logFile << "|   CryptoArb Log File   |\n";
+  logFile << "--------------------------\n";
+  // logFile << "CryptoArb started time: " << printDateTime() << "\n\n";
+  logFile << "CryptoArb started time: NULL" << "\n\n";
+
+  logFile << "[ Information ]\n\t\t";
 
   // sanity check of the parameters
   if (params.leg1 == "BTC" and params.leg2 == "USD") {
-    std::cout << " >>> trading pair: [ BTC, USD ] <<<" << std::endl;
+    logFile << "trading pair: [ BTC, USD ]\n\t";
   } else {
-    std::cout << "ERROR: only support BTC / USD pair" << std::endl;
+    logFile << "ERROR: only support BTC / USD pair\n\t";
     exit(EXIT_FAILURE);
   }
-
+/*
   // dababase connections
   int db_status = createDbConnection(params);
   if (db_status != 0) {
@@ -57,6 +73,7 @@ int main(int argc, char **argv) {
   }
   // TODO: add more exchagnes
 
+  
   std::vector<BasicCoin *> CoinVec{
       new Bitcoin(0, true),
       new Ethereum(1, true),
@@ -77,22 +94,10 @@ int main(int argc, char **argv) {
           << "TOTAL_EXPOSURE,"
           << "BALANCE_BEFORE,"
           << "BALANCE_AFTER,"
-          << "RETURN" << std::endl;
+          << "RETURN" 
+          << std::endl;
 
-  // create log files
-  std::string logFileName = "output/log/CryptoArb_log_" + currDateTime + ".log";
-  std::cout << " >>> Log file generated: " << logFileName << " <<<\n";
-  std::cout << " >>> CryptoArb is running... <<<" << std::endl;
-  std::ofstream logFile(logFileName, std::ofstream::trunc);
-  logFile << std::setprecision(3) << std::fixed;
-  params.logFile = &logFile;
-
-  logFile << "--------------------------\n";
-  logFile << "|   CryptoArb Log File   |\n";
-  logFile << "--------------------------\n";
-  logFile << "CryptoArb started time: " << printDateTime() << "\n\n";
-  logFile << "Connected to database \'" << params.dbFile << "\'\n\n";
-
+*/
   if (params.isDemoMode)
     logFile << "Demo mode: trades won't be generated\n\n";
 
@@ -121,7 +126,7 @@ int main(int argc, char **argv) {
   // *****************************
 
   logFile << "[ Current Balance ]\n";
-
+/*
   for (auto &exch : ExchangeVec) {
 
     // get balance in the exchange
@@ -129,6 +134,7 @@ int main(int argc, char **argv) {
     exch->getAvailBalance(params);
     logFile << "\t" << exch->getExchName() << "\n";
 
+    /*
     for (auto &coin : CoinVec) {
       std::string coinName = coin->getCoinName();
       auto bal = exch->getBalance(coinName);
@@ -144,7 +150,7 @@ int main(int argc, char **argv) {
                 << "not implemented";
       }
     }
-  }
+  }*/
   logFile << std::endl;
 
   // ****************
@@ -168,7 +174,7 @@ int main(int argc, char **argv) {
   int i = 3;
   bool running = true;
   while (running and i--) {
-    currTime = std::mktime(&timeinfo);
+    /* currTime = std::mktime(&timeinfo);
 
     for (auto exchange : ExchangeVec) {
       std::string exchName = exchange->getExchName();
@@ -183,11 +189,11 @@ int main(int argc, char **argv) {
                 << std::endl;
 
       curl_easy_reset(params.curl);
-    }
+    }*/
   }
-
+/*
   csvFile.close();
-  curl_easy_cleanup(params.curl);
+  curl_easy_cleanup(params.curl); */
 
   std::cout << " >>> CryptoArb has been correctly terminated. <<<" << std::endl;
 
