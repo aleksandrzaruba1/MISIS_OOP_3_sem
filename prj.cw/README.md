@@ -24,6 +24,7 @@ Dependencies: <a href="https://www.openssl.org/source" target="_blank">OpenSSL</
 
 ```bash
     git clone https://github.com/aleksandrzaruba1/misis2023f-22-01-zaruba-a-a.git
+    cd misis2023f-22-01-zaruba-a-a/prj.cw
     cmake -S . -B build
     cmake --build build
     ./build/CryptoArb
@@ -32,5 +33,6 @@ Dependencies: <a href="https://www.openssl.org/source" target="_blank">OpenSSL</
 ## Automatically
 
 ```bash
+    cd misis2023f-22-01-zaruba-a-a/prj.cw
     ./run.sh
 ```
