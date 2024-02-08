@@ -25,6 +25,7 @@ Dependencies: <a href="https://www.openssl.org/source" target="_blank">OpenSSL</
 ```bash
     git clone https://github.com/aleksandrzaruba1/MISIS_OOP_3_sem.git
     cmake -S . -B build
+    cmake --build build
     ./build/CryptoArb
 ```
 
