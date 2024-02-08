@@ -15,27 +15,6 @@ arbicrypto is built to exploit these opportunities to automatically profit from
 the temporary price difference while maintaining market-neutral, to mitigate
 risks.
 
-
-### How to build & run
-
-Dependencies: <a href="https://www.openssl.org/source" target="_blank">OpenSSL</a>, <a href="http://curl.haxx.se" target="_blank">CURL</a>, <a href="http://www.sqlite.org" target="_blank">SQLite3</a>, <a href="https://cmake.org" target="_blank">CMake</a>
-
-1. Clone from Github
-
-```bash
-    git clone https://github.com/aleksandrzaruba1/MISIS_OOP_3_sem.git
-```
-
-2. Build the project
-```bash
-    cmake -S . -B build
-```
-
-3. Run the executable
-```bash
-    ./build/CryptoArb
-```
-
 ### Theory of Arbitrage
 
 *#Bellman-Ford Algorithm*, *#Negative Cycle Detection* and *#Graph Theory*.
