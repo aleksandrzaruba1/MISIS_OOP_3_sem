@@ -1,3 +1,0 @@
-/Users/crzy/Downloads/MISIS_OOP_3_sem/prj.cw/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
-/Users/crzy/Downloads/MISIS_OOP_3_sem/prj.cw/build/_deps/googletest-subbuild/CMakeFiles/edit_cache.dir
-/Users/crzy/Downloads/MISIS_OOP_3_sem/prj.cw/build/_deps/googletest-subbuild/CMakeFiles/rebuild_cache.dir
