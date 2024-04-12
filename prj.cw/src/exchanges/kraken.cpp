@@ -1,12 +1,25 @@
+/**
+ * @file kraken.h
+ * @brief Содержит объявление класса Kraken, представляющего биржу Kraken.
+ */
+
 #include "exchanges/kraken.h"
 #include "parameters.h"
 #include "utils/restapi.h"
 
+/**
+ * @brief Конструктор по умолчанию класса Kraken.
+ */
 Kraken::Kraken() {
   exchName = "Kraken";
   isImplemented = true;
 }
 
+/**
+ * @brief Получает баланс указанной валюты.
+ * @param currency Валюта, баланс которой требуется получить.
+ * @return Баланс указанной валюты.
+ */
 double Kraken::getBalance(std::string &currency) const {
   auto it = std::find_if(
       balances.cbegin(), balances.cend(),
@@ -15,6 +28,12 @@ double Kraken::getBalance(std::string &currency) const {
   return it == std::end(balances) ? -1.0 : it->free;
 }
 
+/**
+ * @brief Получает котировку указанного символа.
+ * @param params Параметры для выполнения запроса.
+ * @param symbol Символ, котировку которого требуется получить.
+ * @return Пара bid и ask значений котировки.
+ */
 quote_t Kraken::getQuote(Parameters &params, std::string symbol) {
   RestApi api{"https://api.binance.us", params.cacert.c_str(), *params.logFile};
   std::string x{"/api/v3/ticker/bookTicker?symbol=BTCUSDT"};
@@ -33,16 +52,20 @@ quote_t Kraken::getQuote(Parameters &params, std::string symbol) {
   return std::make_pair(bidValue, askValue);
 }
 
+/**
+ * @brief Получает доступные балансы.
+ * @param params Параметры для выполнения запроса.
+ */
 void Kraken::getAvailBalance(Parameters &params) {
   unique_json root{authRequest(params, "GET", "/api/v3/account", "")};
 
-  // currently 170 different assets
+  // в настоящее время 170 различных активов
   size_t arraySize = json_array_size(json_object_get(root.get(), "balances"));
 
-  // array of size 170
+  // массив размером 170
   auto raw_balances = json_object_get(root.get(), "balances");
 
-  // balances is a class member
+  // balances - член класса
 
   for (size_t i = 0; i < arraySize; ++i) {
     std::string asset = json_string_value(
@@ -56,7 +79,14 @@ void Kraken::getAvailBalance(Parameters &params) {
 
   return;
 }
-
+/**
+ * @brief Выполняет аутентифицированный запрос к API.
+ * @param params Параметры для выполнения запроса.
+ * @param method Метод запроса (POST или GET).
+ * @param request Запрос к API.
+ * @param options Опции запроса.
+ * @return Указатель на JSON-объект с ответом от API.
+ */
 json_t *Kraken::authRequest(Parameters &params, std::string method,
                              std::string request, std::string options) {
   RestApi api{"https://api.binance.us", params.cacert.c_str(), *params.logFile};
@@ -70,7 +100,7 @@ json_t *Kraken::authRequest(Parameters &params, std::string method,
 
   std::array<std::string, 1> headers{"X-MBX-APIKEY:" + params.binanceApi};
 
-  // build request
+  // сборка запроса
   if (method == "POST") {
     payload = options + "&timestamp=" + timestamp;
     sig = getSignature(params, payload);
@@ -86,11 +116,17 @@ json_t *Kraken::authRequest(Parameters &params, std::string method,
     return api.getRequest(uri,
                           make_slist(std::begin(headers), std::end(headers)));
   } else {
-    std::cerr << "Request method should be either POST or GET" << std::endl;
+    std::cerr << "Метод запроса должен быть либо POST, либо GET" << std::endl;
     exit(1);
   }
 }
 
+/**
+ * @brief Генерирует подпись для аутентификации запроса к API.
+ * @param params Параметры для выполнения запроса.
+ * @param payload Данные запроса.
+ * @return Строка с сгенерированной подписью.
+ */
 std::string Kraken::getSignature(Parameters &params, std::string payload) {
   uint8_t *hmac_digest = HMAC(EVP_sha256(), params.binanceSecret.c_str(),
                               params.binanceSecret.size(),
