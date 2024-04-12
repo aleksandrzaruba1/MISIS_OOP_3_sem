@@ -1,21 +1,27 @@
 #include "parameters.h"
-
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
+/**
+ * @brief Находит конфигурационный файл по имени.
+ * 
+ * @param fileName Имя файла.
+ * @return std::string Полный путь к найденному конфигурационному файлу или пустая строка, если файл не найден.
+ */
 static std::string findConfigFile(std::string fileName) {
-  // local directory
+  // Локальная директория
   {
     std::ifstream configFile(fileName);
 
-    // Keep the first match
+    // Сохраняем первое совпадение
     if (configFile.good()) {
       return fileName;
     }
   }
 
-  // Unix user settings directory
+  // Директория настроек Unix пользователя
   {
     char *home = getenv("HOME");
 
@@ -24,14 +30,14 @@ static std::string findConfigFile(std::string fileName) {
       std::string fullpath = prefix + "/" + fileName;
       std::ifstream configFile(fullpath);
 
-      // Keep the first match
+      // Сохраняем первое совпадение
       if (configFile.good()) {
         return fullpath;
       }
     }
   }
 
-  // Windows user settings directory
+  // Директория настроек пользователя Windows
   {
     char *appdata = getenv("APPDATA");
 
@@ -40,36 +46,39 @@ static std::string findConfigFile(std::string fileName) {
       std::string fullpath = prefix + "/" + fileName;
       std::ifstream configFile(fullpath);
 
-      // Keep the first match
+      // Сохраняем первое совпадение
       if (configFile.good()) {
         return fullpath;
       }
     }
   }
+}
+// Директория настроек системы Unix
+{
+  std::string fullpath = "/etc/" + fileName;
+  std::ifstream configFile(fullpath);
 
-  // Unix system settings directory
-  {
-    std::string fullpath = "/etc/" + fileName;
-    std::ifstream configFile(fullpath);
-
-    // Keep the first match
-    if (configFile.good()) {
-      return fullpath;
-    }
+  // Сохраняем первое совпадение
+  if (configFile.good()) {
+    return fullpath;
   }
-
-  // We have to return something, even though we already know this will
-  // fail
-  return fileName;
 }
 
+// Мы должны вернуть что-то, даже если знаем, что это не сработает
+return fileName;
+/**
+ * @brief Конструктор класса Parameters.
+ * 
+ * @param fileName Имя файла конфигурации.
+ */
 Parameters::Parameters(std::string fileName) {
   std::ifstream configFile(findConfigFile(fileName));
   if (!configFile.is_open()) {
-    std::cout << "ERROR: " << fileName << " cannot be open.\n";
+    std::cout << "ERROR: " << fileName << " не может быть открыт.\n";
     exit(EXIT_FAILURE);
   }
 
+  // Инициализация параметров из файла конфигурации
   spreadEntry = getDouble(getParameter("SpreadEntry", configFile));
   spreadTarget = getDouble(getParameter("SpreadTarget", configFile));
   maxLength = getUnsigned(getParameter("MaxLength", configFile));
@@ -91,6 +100,7 @@ Parameters::Parameters(std::string fileName) {
   volatilityPeriod = getUnsigned(getParameter("VolatilityPeriod", configFile));
   cacert = getParameter("CACert", configFile);
 
+  // Инициализация параметров для API различных бирж
   okcoinApi = getParameter("OkCoinApiKey", configFile);
   okcoinSecret = getParameter("OkCoinSecretKey", configFile);
   okcoinFees = getDouble(getParameter("OkCoinFees", configFile));
@@ -116,17 +126,24 @@ Parameters::Parameters(std::string fileName) {
   binanceSecret = getParameter("BinanceSecretKey", configFile);
   binanceFees = getDouble(getParameter("BinanceFees", configFile));
   binanceEnable = getBool(getParameter("BinanceEnable", configFile));
-
-  // sendEmail = getBool(getParameter("SendEmail", configFile));
-  // senderAddress = getParameter("SenderAddress", configFile);
-  // senderUsername = getParameter("SenderUsername", configFile);
-  // senderPassword = getParameter("SenderPassword", configFile);
-  // smtpServerAddress = getParameter("SmtpServerAddress", configFile);
-  // receiverAddress = getParameter("ReceiverAddress", configFile);
-
-  dbFile = getParameter("DBFile", configFile);
 }
+// sendEmail = getBool(getParameter("SendEmail", configFile));
+// senderAddress = getParameter("SenderAddress", configFile);
+// senderUsername = getParameter("SenderUsername", configFile);
+// senderPassword = getParameter("SenderPassword", configFile);
+// smtpServerAddress = getParameter("SmtpServerAddress", configFile);
+// receiverAddress = getParameter("ReceiverAddress", configFile);
 
+// Получение имени файла базы данных
+dbFile = getParameter("DBFile", configFile);
+/**
+ * @brief Добавляет информацию о бирже.
+ * 
+ * @param n Название биржи.
+ * @param f Сборы сделки.
+ * @param h Возможность продажи на короткую позицию.
+ * @param m Реализована ли биржа.
+ */
 void Parameters::addExchange(std::string n, double f, bool h, bool m) {
   exchName.push_back(n);
   fees.push_back(f);
@@ -134,8 +151,20 @@ void Parameters::addExchange(std::string n, double f, bool h, bool m) {
   isImplemented.push_back(m);
 }
 
+/**
+ * @brief Возвращает количество бирж.
+ * 
+ * @return int Количество бирж.
+ */
 int Parameters::nbExch() const { return exchName.size(); }
 
+/**
+ * @brief Получает значение параметра из файла конфигурации.
+ * 
+ * @param parameter Имя параметра.
+ * @param configFile Файл конфигурации.
+ * @return std::string Значение параметра.
+ */
 std::string getParameter(std::string parameter, std::ifstream &configFile) {
   assert(configFile);
   std::string line;
@@ -152,13 +181,31 @@ std::string getParameter(std::string parameter, std::ifstream &configFile) {
     }
   }
   std::cout << "ERROR: parameter '" << parameter
-            << "' not found. Your configuration file might be too old.\n"
+            << "' not found. Ваш файл конфигурации может быть слишком старым.\n"
             << std::endl;
   exit(EXIT_FAILURE);
 }
 
+/**
+ * @brief Преобразует строку в булево значение.
+ * 
+ * @param value Строка со значением.
+ * @return bool Булево значение.
+ */
 bool getBool(std::string value) { return value == "true"; }
 
+/**
+ * @brief Преобразует строку в значение типа double.
+ * 
+ * @param value Строка со значением.
+ * @return double Значение типа double.
+ */
 double getDouble(std::string value) { return atof(value.c_str()); }
 
+/**
+ * @brief Преобразует строку в беззнаковое целое число.
+ * 
+ * @param value Строка со значением.
+ * @return unsigned Беззнаковое целое число.
+ */
 unsigned getUnsigned(std::string value) { return atoi(value.c_str()); }
