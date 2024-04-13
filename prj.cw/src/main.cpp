@@ -1,3 +1,7 @@
+/** 
+ * @brief Основной файл программы CryptoArb, который содержит реализацию
+ *        программы для арбитража криптовалют.
+ */
 #include "parameters.h"
 #include "utils/db_fun.h"
 #include "utils/time_fun.h"
@@ -13,26 +17,34 @@
 #include <iostream>
 #include <vector>
 
+/**
+ * @brief Структура, представляющая баланс.
+ */
 struct Balance {
-  double leg1;
-  double leg2;
-  double leg1After;
-  double leg2After;
+  double leg1;        /**< Баланс первой валюты */
+  double leg2;        /**< Баланс второй валюты */
+  double leg1After;   /**< Баланс первой валюты после операций */
+  double leg2After;   /**< Баланс второй валюты после операций */
 };
-
+/**
+ * @brief Главная функция программы.
+ * @param argc Количество аргументов командной строки.
+ * @param argv Массив аргументов командной строки.
+ * @return Код возврата программы.
+ */
 int main(int argc, char **argv) {
   std::cout << " >>> CryptoArb Cryptocurrencies Arbitrage Bot <<<" << std::endl;
 
 
-  // read config file
+  // Чтение файла конфигурации
   Parameters params("CryptoArb.conf");
 
-  // std::string currDateTime = printDateTimeFileName();
+  //Создание имени лог-файла с текущей датой и временем
   std::string currDateTime = "today";
   std::string logFileName = "output/log/CryptoArb_log_" + currDateTime + ".log";
   std::cout << " >>> Log file generated at ./output/log/: " << logFileName << " <<<" << std::endl;
 
-  // create log files that stores all the events
+  // Создание файла для логирования событий
   std::ofstream logFile(logFileName, std::ofstream::trunc);
   // logFile << std::setprecision(3) << std::fixed;
   params.logFile = &logFile;
@@ -45,7 +57,7 @@ int main(int argc, char **argv) {
 
   logFile << "[ Information ]\n\t\t";
 
-  // sanity check of the parameters
+  // Проверка параметров
   if (params.leg1 == "BTC" and params.leg2 == "USD") {
     logFile << "trading pair: [ BTC, USD ]\n\t";
   } else {
@@ -106,12 +118,11 @@ int main(int argc, char **argv) {
   // *********************
   // * Log profit target *
   // *********************
-
+  // Логирование целей прибыли (вход в спред и целевой показатель спреда должны быть равны +, иначе вы потеряете $)
   logFile << "[ Targets ]\n";
   logFile << "\tSpread Entry : " << params.spreadEntry * 100.0 << "%\n";
   logFile << "\tSpread Target: " << params.spreadTarget * 100.0 << "%\n\n";
 
-  // spread entry & spread target should both be +, otherwise we'll lose $
   if (params.spreadEntry <= 0.0)
     logFile << "\t\t WARNING: Spread Entry should be positive.\n";
 
@@ -124,7 +135,7 @@ int main(int argc, char **argv) {
   // * Get balances of coins in  *
   // * exchanges and log results *
   // *****************************
-
+// Логирование текущего баланса валют
   logFile << "[ Current Balance ]\n";
 /*
   for (auto &exch : ExchangeVec) {
@@ -163,16 +174,27 @@ int main(int argc, char **argv) {
   // * main analysis loop *
   // **********************
 
-  // initialize curl connections
+  // Инициализация соединений cURL
   params.curl = curl_easy_init();
 
-  // time info
-  time_t rawtime = time(nullptr); // returns the current calendar time encoded
-  tm timeinfo = *localtime(&rawtime); // struct tm holding a calendar data
+  // Информация о времени
+  
+  /**
+   * @brief Получает текущее календарное время.
+   * @return Возвращает текущее календарное время в формате `time_t`.
+   */
+  time_t rawtime = time(nullptr);
+  /**
+   * @brief Преобразует время из `time_t` в структуру `tm`, представляющую календарные данные.
+   * @param rawtime Значение времени в формате `time_t` для преобразования.
+   * @return Возвращает структуру `tm`, содержащую календарные данные.
+   */
+  tm timeinfo = *localtime(&rawtime);
   time_t currTime;
   int i = 3;
   bool running = true;
   while (running and i--) {
+
     /* currTime = std::mktime(&timeinfo);
 
     for (auto exchange : ExchangeVec) {
